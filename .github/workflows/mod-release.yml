@@ -31,10 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install copilot-chat-analyzer dependencies
-        run: npm ci
-        working-directory: copilot-chat-analyzer
-
       - name: Update version (if manual trigger)
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -59,10 +55,6 @@ jobs:
           else
             echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
-
-      - name: Build copilot-chat-analyzer
-        run: npm run build
-        working-directory: copilot-chat-analyzer
 
       - name: Build extension
         run: npm run build

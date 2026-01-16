@@ -27,14 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install copilot-chat-analyzer dependencies
-        run: npm ci
-        working-directory: copilot-chat-analyzer
-
-      - name: Build copilot-chat-analyzer
-        run: npm run build
-        working-directory: copilot-chat-analyzer
-
       - name: Build extension
         run: npm run build
 
