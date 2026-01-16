@@ -48,8 +48,11 @@ jobs:
       - name: Get version from package.json
         id: package-version
         run: |
+          PUBLISHER=$(node -p "require('./package.json').publisher")
+          NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "filename=${PUBLISHER}.${NAME}-${VERSION}-mod.vsix" >> $GITHUB_OUTPUT
           if [[ "$VERSION" == *-* ]]; then
             echo "prerelease=true" >> $GITHUB_OUTPUT
           else
@@ -57,7 +60,7 @@ jobs:
           fi
 
       - name: Build extension
-        run: npm run build
+        run: npx @vscode/vsce package -o ${{ steps.package-version.outputs.filename }}
 
       - name: Upload VSIX as artifact
         uses: actions/upload-artifact@v4
