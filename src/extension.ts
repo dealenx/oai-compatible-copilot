@@ -157,6 +157,25 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
+
+	// Silent command to check if global API key is set
+	context.subscriptions.push(
+		vscode.commands.registerCommand("oaicopilot.hasApiKey", async (): Promise<boolean> => {
+			const apiKey = await context.secrets.get("oaicopilot.apiKey");
+			return !!apiKey && apiKey.trim().length > 0;
+		})
+	);
+
+	// Silent command to check if provider-specific API key is set
+	context.subscriptions.push(
+		vscode.commands.registerCommand("oaicopilot.hasProviderApiKey", async (provider: string): Promise<boolean> => {
+			if (!provider) {
+				return false;
+			}
+			const apiKey = await context.secrets.get(`oaicopilot.apiKey.${provider.toLowerCase()}`);
+			return !!apiKey && apiKey.trim().length > 0;
+		})
+	);
 }
 
 export function deactivate() {}
