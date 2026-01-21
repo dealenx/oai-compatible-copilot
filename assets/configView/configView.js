@@ -64,6 +64,7 @@ const saveModelBtn = document.getElementById("saveModel");
 const cancelModelBtn = document.getElementById("cancelModel");
 const toggleAdvancedSettingsBtn = document.getElementById("toggleAdvancedSettings");
 const commitModelInput = document.getElementById("commitModel");
+const commitLanguageInput = document.getElementById("commitLanguage");
 const advancedSettingsContent = document.getElementById("advancedSettingsContent");
 
 // Error message element
@@ -94,6 +95,7 @@ document.getElementById("saveBase").addEventListener("click", () => {
 		delay: parseInt(delayInput.value) || 0,
 		retry: retry,
 		commitModel: commitModelInput.value,
+		commitLanguage: commitLanguageInput.value,
 	});
 });
 
@@ -242,7 +244,7 @@ window.addEventListener("message", (event) => {
 
 	switch (message.type) {
 		case "init":
-			const { baseUrl, apiKey, delay, retry, commitModel, models, providerKeys } = message.payload;
+			const { baseUrl, apiKey, delay, retry, commitModel, models, providerKeys,commitLanguage } = message.payload;
 			state.baseUrl = baseUrl;
 			state.apiKey = apiKey;
 			state.delay = delay || 0;
@@ -268,6 +270,7 @@ window.addEventListener("message", (event) => {
 			// Populate commit model dropdown and select current commit model
 			populateCommitModelDropdown();
 			commitModelInput.value = state.commitModel || "";
+			commitLanguageInput.value = commitLanguage;
 
 			// Render provider and model management
 			renderProviders();
@@ -685,6 +688,11 @@ function validateModelData(modelData) {
 		showModelError("Max Completion Tokens must be a positive number.");
 		return false;
 	}
+	// Prevent both max_tokens and max_completion_tokens from being set simultaneously
+	if (modelData.max_tokens !== undefined && modelData.max_completion_tokens !== undefined) {
+		showModelError("Cannot set both 'max_tokens' and 'max_completion_tokens'. Use 'max_completion_tokens' only.");
+		return false;
+	}
 	if (
 		modelData.temperature !== undefined &&
 		(isNaN(modelData.temperature) || modelData.temperature < 0 || modelData.temperature > 2)
@@ -833,7 +841,7 @@ function populateModelForm(model) {
 	modelBaseUrlInput.value = model.baseUrl || "";
 	modelFamilyInput.value = model.family || "";
 	modelContextLengthInput.value = model.context_length || "";
-	modelMaxTokensInput.value = model.max_tokens || model.max_completion_tokens || "";
+	modelMaxTokensInput.value = model.max_tokens || "";
 	modelVisionInput.value = model.vision !== undefined ? String(model.vision) : "";
 	modelApiModeInput.value = model.apiMode || "openai";
 	modelTemperatureInput.value = model.temperature !== undefined && model.temperature !== null ? model.temperature : "";
