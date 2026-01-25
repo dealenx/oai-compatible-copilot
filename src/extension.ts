@@ -176,6 +176,27 @@ export function activate(context: vscode.ExtensionContext) {
 			return !!apiKey && apiKey.trim().length > 0;
 		})
 	);
+
+	// Silent command to set models configuration programmatically
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"oaicopilot.silentSetModelsConfig",
+			async (models: HFModelItem[]): Promise<boolean> => {
+				if (models === undefined || !Array.isArray(models)) {
+					return false;
+				}
+				try {
+					// Normalize models to ensure owned_by is set correctly from alias fields
+					const normalizedModels = normalizeUserModels(models);
+					const config = vscode.workspace.getConfiguration();
+					await config.update("oaicopilot.models", normalizedModels, vscode.ConfigurationTarget.Global);
+					return true;
+				} catch {
+					return false;
+				}
+			}
+		)
+	);
 }
 
 export function deactivate() {}
